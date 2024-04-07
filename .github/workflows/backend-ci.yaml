@@ -1,0 +1,82 @@
+name: Backend Continuous Integration
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' 
+    - name: Cache NPM dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-npm-cache-
+    - name: Install NPM dependencies
+      working-directory: ./frontend
+      run: npm install
+    - name: Lint code
+      working-directory: ./frontend
+      run: npm run lint
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Cache NPM dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-npm-cache-
+
+    - name: Install NPM dependencies
+      working-directory: ./frontend
+      run: npm install
+
+    - name: Test code
+      working-directory: ./frontend/src
+      run: npm run test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Cache NPM dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-npm-cache-
+
+    - name: Install NPM dependencies
+      run: npm install
+      working-directory: ./frontend
+    - name: Test code
+      working-directory: ./frontend/src
+      run: npm run test
