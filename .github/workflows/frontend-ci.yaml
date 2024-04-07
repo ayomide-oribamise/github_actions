@@ -52,7 +52,7 @@ jobs:
       run: npm install
 
     - name: Test code
-      working-directory: ./frontend
+      working-directory: ./frontend/src
       run: npm run test
 
   build:
@@ -72,10 +72,10 @@ jobs:
         key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.OS }}-npm-cache-
-          
+
     - name: Install NPM dependencies
       run: npm install
       working-directory: ./frontend
     - name: Test code
-      working-directory: ./frontend
+      working-directory: ./frontend/src
       run: npm run test
