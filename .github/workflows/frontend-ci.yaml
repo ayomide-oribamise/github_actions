@@ -46,11 +46,15 @@ jobs:
         key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.OS }}-npm-cache-
+
     - name: Install NPM dependencies
+      working-directory: ./frontend
       run: npm install
+
     - name: Test code
       working-directory: ./frontend
       run: npm run test
+
   build:
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -68,8 +72,10 @@ jobs:
         key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.OS }}-npm-cache-
+          
     - name: Install NPM dependencies
       run: npm install
+      working-directory: ./frontend
     - name: Test code
       working-directory: ./frontend
       run: npm run test
