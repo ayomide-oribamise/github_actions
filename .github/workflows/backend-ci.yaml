@@ -27,6 +27,7 @@ jobs:
    
     - name: Install dependencies
       run: cd backend && pipenv install
+      run: which flake8
 
     - name: Lint code
       run: cd backend && pipenv run lint
