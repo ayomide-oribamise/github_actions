@@ -26,10 +26,10 @@ jobs:
         pipenv-version: "v2022.9.21"
    
     - name: Install dependencies
-      run: cd backend && pipenv install
-    
-    - name: Install
-      run: cd backend && pipenv install flake8
+      run: |
+        cd backend
+        pipenv install
+        pipenv install flake8
 
     - name: Lint code
       run: cd backend && pipenv run lint
