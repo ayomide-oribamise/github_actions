@@ -29,7 +29,7 @@ jobs:
       run: cd backend && pipenv install
     
     - name: Check flake8's path
-      run: which flake8
+      run: echo $PATH
 
     - name: Lint code
       run: cd backend && pipenv run lint
