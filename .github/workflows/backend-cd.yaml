@@ -1,0 +1,91 @@
+name: Backend Continuous Deployment
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10" 
+        cache: "pipenv"
+
+    - name: Install pipenv
+      uses: tiagovrtr/actions-pipenv@v1
+      with:
+        pipenv-version: "v2022.9.21"
+   
+    - name: Install dependencies
+      run: |
+        cd backend
+        pipenv install
+        pipenv install flake8
+
+    - name: Lint code
+      run: cd backend && pipenv run lint
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+          
+    - name: Install pipenv
+      uses: tiagovrtr/actions-pipenv@v1
+      with:
+        pipenv-version: "v2022.9.21"
+   
+    - name: Install dependencies
+      run: cd backend && pipenv install
+
+    - name: Test code
+      run: cd backend && pipenv run test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build Docker image
+        run: |
+          cd backend
+          docker build -t backend-app .
+          docker tag backend-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-app:latest
+
+  login-ecr:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          region: ${{ secrets.AWS_REGION }}
+          registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+  push-image:
+    runs-on: ubuntu-latest
+    needs: login-ecr
+    steps:
+      - name: Push image to ECR
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: push-ecr
+    steps:
+      - name: Deploy to EKS cluster
+        run: |
+          kubectl apply -f k8s
