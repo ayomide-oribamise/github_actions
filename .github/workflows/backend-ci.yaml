@@ -1,0 +1,78 @@
+name: Backend Continuous Integration
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10" 
+        cache: "pipenv"
+
+    - name: Install pipenv
+      uses: tiagovrtr/actions-pipenv@v1
+      with:
+        pipenv-version: "v2022.9.21"
+   
+    - name: Install dependencies
+      run: |
+        cd backend
+        pipenv install
+        pipenv install flake8
+
+    - name: Lint code
+      run: cd backend && pipenv run lint
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+          
+    - name: Install pipenv
+      uses: tiagovrtr/actions-pipenv@v1
+      with:
+        pipenv-version: "v2022.9.21"
+   
+    - name: Install dependencies
+      run: cd backend && pipenv install
+
+    - name: Test code
+      run: cd backend && pipenv run test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install pipenv
+      uses: tiagovrtr/actions-pipenv@v1
+      with:
+        pipenv-version: "v2022.9.21"
+   
+    - name: Install dependencies
+      run: cd backend && pipenv install
+
+    - name: Test code
+      run: cd backend && pipenv run test
