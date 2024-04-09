@@ -157,5 +157,5 @@ jobs:
         run: |
           cd backend/k8s
           kustomize build
-          cd ..
+          cd ../..
           kubectl apply -f backend/k8s
