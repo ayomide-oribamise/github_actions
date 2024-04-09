@@ -102,7 +102,7 @@ jobs:
           path: /tmp/frontend.tar
       - name: Load image
         run: |
-          docker load --input /tmp/frontend.tar
+          docker load --input /tmp/frontend.tar frontend
 
       - name: Push image to ECR
         run: |
