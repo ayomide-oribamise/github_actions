@@ -147,6 +147,9 @@ jobs:
           
       - name: Deploy to EKS cluster
         run: |
+
+          cd backend/k8s
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           kustomize build
+          cd ..
           kubectl apply -f backend/k8s --kubeconfig=kubeconfig.yaml
