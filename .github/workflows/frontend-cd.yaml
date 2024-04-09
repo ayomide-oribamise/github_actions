@@ -63,6 +63,9 @@ jobs:
           cd frontend
           docker build -t frontend --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL .
       
+      - name: Save Docker image
+        run: docker save --output frontend.tar frontend
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
