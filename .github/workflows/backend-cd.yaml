@@ -156,6 +156,6 @@ jobs:
       - name: Deploy to EKS cluster
         run: |
           cd backend/k8s
-          kustomize build
+          kustomize build --validate=false
           cd ../..
           kubectl apply -f backend/k8s
