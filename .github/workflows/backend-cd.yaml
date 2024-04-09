@@ -148,6 +148,8 @@ jobs:
       - name: Deploy to EKS cluster
         run: |
 
+          echo $PWD
+          ls
           cd backend/k8s
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           kustomize build
